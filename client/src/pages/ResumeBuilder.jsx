@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams , Link } from 'react-router-dom';
 import { dummyResumeData } from '../assets/assets';
 import { ArrowLeftIcon, Briefcase, FileText, UserIcon , User, GraduationCap, FolderIcon , Sparkles , ChevronLeft , ChevronRight  } from 'lucide-react';
+import PersonalInfoForm from '../components/PersonalInfoForm';
 
 function ResumeBuilder() {
 
@@ -11,7 +12,7 @@ const { resumeId } = useParams();
 const [resumeData , setResumeData] = useState({
 _id : "",
 title : "",
-personalInfo : {},
+personal_info : {},
 professionalSummary : "",
 workExperience : [],
 education : [],
@@ -88,7 +89,12 @@ loadExistingResume() ;
 <div className='space-y-6'>
 {
 activeSection.id === "personal" && (
-<></>
+<PersonalInfoForm 
+data={resumeData.personal_info}
+onChange={(data)=> setResumeData(prev => ({...prev, personalInfo : data}))}
+removeBackground={removeBackground}
+setRemoveBackground={setRemoveBackground}
+/>
 )
 }
 {
@@ -126,7 +132,13 @@ activeSection.id === "skills" && (
 </div>
 </div>
 {/* RIGHT - RESUME PREVIEW */ }
-<div></div>
+<div className='lg:col-span-7 max-lg:mt-6'>
+<div>
+{/* Buttons  */}
+</div>
+
+{/* Resume Preview */}
+</div>
 </div>
 </div>
 
