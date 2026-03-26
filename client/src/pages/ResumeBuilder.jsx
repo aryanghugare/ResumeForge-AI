@@ -5,8 +5,10 @@ import { dummyResumeData } from '../assets/assets';
 import { ArrowLeftIcon, Briefcase, FileText, UserIcon , User, GraduationCap, FolderIcon , Sparkles , ChevronLeft , ChevronRight  } from 'lucide-react';
 import PersonalInfoForm from '../components/PersonalInfoForm';
 import ResumePreview from '../components/ResumePreview';
-import ColorPicker from '../components/ColorPicke';
+import ColorPicker from '../components/ColorPicker';
 import TemplateSelector from '../components/TemplateSelector';
+import ProfessionalSummaryForm from '../components/ProfessionalSummaryForm';
+import ExperienceForm from '../components/ExperienceForm';
 
 function ResumeBuilder() {
 
@@ -74,7 +76,7 @@ loadExistingResume() ;
 
 {/* Section navigation */ }
    <div className="flex justify-between items-center mb-6 border-b border-gray-300 py-1">
-<div>
+<div className='flex items-center gap-2'>
 <TemplateSelector selectedTemplate = {resumeData.template} onChange={(template) => setResumeData(prev => ({ ...prev, template }))} />
 <ColorPicker selectedColor={resumeData.accent_color} onChange={(color) => setResumeData(prev => ({ ...prev, accent_color: color }))} />
 </div>
@@ -100,12 +102,12 @@ activeSection.id === "personal" && (
 }
 {
 activeSection.id === "summary" && (
-<></>
+<ProfessionalSummaryForm data={resumeData.professional_summary} onChange={(data)=>setResumeData(prev => ({...prev, professional_summary: data }))} setResumeData={setResumeData} />
 )
 }
 {
 activeSection.id === "experience" && (
-<></>
+<ExperienceForm data={resumeData.experience} onChange={(data)=>setResumeData(prev => ({...prev, experience: data }))} />
 )
 }
 {
