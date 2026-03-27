@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ApiError } from "../utils/ApiError";
 
 const connectDB = async () => {
     try {
@@ -8,7 +9,7 @@ const connectDB = async () => {
         const projectName = 'resume-builder';
 
         if(!mongodbURI){
-            throw new Error("MONGODB_URI environment variable not set")
+            throw new ApiError(500, "MONGODB_URI environment variable not set")
         }
 
         if(mongodbURI.endsWith('/')){
@@ -18,6 +19,7 @@ const connectDB = async () => {
         await mongoose.connect(`${mongodbURI}/${projectName}`)
     } catch (error) {
         console.error("Error connecting to MongoDB:", error)
+            throw new ApiError(500, "Failed to connect to MongoDB", [], error.stack);
     }
 }
 
