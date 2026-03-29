@@ -1,11 +1,18 @@
 import React from "react"
+import api from "../configs/api";
+import { useDispatch } from "react-redux";
+import { login } from "../app/features/authSlice";
+import { toast } from "react-hot-toast";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 export default function Login() {
 
+const dispatch = useDispatch();
 const query = new URLSearchParams(window.location.search);
 const urlState = query.get("state") ;
 
-
+const [passwordVisible, setPasswordVisible] = React.useState(false)
 const [state, setState] = React.useState(urlState||"login")
 
     const [formData, setFormData] = React.useState({
@@ -19,10 +26,27 @@ const [state, setState] = React.useState(urlState||"login")
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
+
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+try {
+    const {data} = await api.post(`/api/users/${state}`,formData);
+dispatch(login(data))
+localStorage.setItem('token', data.token)
+toast.success(data.message)
+} catch (error) {
+   toast.error(error.message)
+}
 
     }
+
+
+
+const handleShowPassword = () =>{
+
+}
 
 
   return (
@@ -50,7 +74,8 @@ const [state, setState] = React.useState(urlState||"login")
 
                 <div className=" flex items-center mt-4 w-full bg-white/5 ring-2 ring-white/10 focus-within:ring-green-500/60 h-12 rounded-full overflow-hidden pl-6 gap-2 transition-all ">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-white/75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"> <rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /> </svg>
-                    <input type="password" name="password" placeholder="Password" className="w-full bg-transparent text-white placeholder-white/60 border-none outline-none" value={formData.password} onChange={handleChange} required />
+                    <input type={passwordVisible ? "text" : "password"} name="password" placeholder="Password" className="w-full bg-transparent text-white placeholder-white/60 border-none outline-none" value={formData.password} onChange={handleChange} required />
+                   <input type="checkbox" className="peer sr-only" id="showPassword" onChange={() => setPasswordVisible((prev) => !prev)} /> <label htmlFor="showPassword" className="cursor-pointer">{passwordVisible ?<EyeOff className="w-4 h-4 text-white/60 peer-checked:text-green-500" /> :<Eye className="w-4 h-4 text-white/60 peer-checked:text-green-500" />}</label>
                 </div>
 
                 <div className="mt-4 text-left">

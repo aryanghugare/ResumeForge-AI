@@ -2,13 +2,18 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import logo from "../assets/logo.svg"
 import { useNavigate} from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logout } from '../app/features/authSlice'
 
 function Navbar() {
+const dispatch = useDispatch() ;
 const user = {name : "John Doe"}
 const navigate = useNavigate() ;
 const handleLogout = () => {
   // Perform logout logic here
   // After logout, navigate to the login page
+
+  dispatch(logout());
   navigate("/");
 }
   return (
