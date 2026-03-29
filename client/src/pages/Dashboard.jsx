@@ -3,9 +3,15 @@ import React from 'react'
 import { useState , useEffect } from 'react'
 import { dummyResumeData } from "../assets/assets.js"
 import { Link , useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-hot-toast'
+import api from '../configs/api.js'
+import pdfToText from 'react-pdftotext'
 
 
 function Dashboard() {
+
+const {user , token} = useSelector(state => state.auth) ;
 
 const [allResumes , setAllResumes] = useState([]) ;
 const [showCreateResume , setShowCreateResume] = useState(false) ;
@@ -15,19 +21,46 @@ const [resume , setResume] = useState(null) ;
 const [editResumeId, setEditResumeId] = useState("") ;
 const [deleteConfirm ,setDeleteConfirm] = useState(false) ;
 const [resumeToDeleteId, setResumeToDeleteId] = useState("") ;
+const [isLoading, setIsLoading] = useState(false) ;
 const navigate = useNavigate() ;
 
+ const loadAllResumes = async () =>{
+    try {
+      const { data } = await api.get('/api/users/resumes', {headers: { Authorization: token }})
+      setAllResumes(data.resumes)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message)
+    }
+  }
+
 async function createResume(e) {
-e.preventDefault() ;
-  setShowCreateResume(false);
-navigate(`/app/builder/${Date.now()}`) ;
+try {
+    e.preventDefault()
+    const { data } = await api.post('/api/resumes/create', {title}, {headers: { Authorization: token }})
+    setAllResumes([...allResumes, data.resume])
+    setTitle('')
+    setShowCreateResume(false)
+    navigate(`/app/builder/${data.resume._id}`)
+   } catch (error) {
+    toast.error(error?.response?.data?.message || error.message)
+   }
 }
 
-async function uploadResume(e) {
-  e.preventDefault();
-  setShowUploadResume(false);
-navigate(`/app/builder/${Date.now()}`) ;
-}
+const uploadResume = async (event) => {
+    event.preventDefault()
+    setIsLoading(true)
+    try {
+      const resumeText = await pdfToText(resume)
+      const { data } = await api.post('/api/ai/upload-resume', {title, resumeText}, {headers: { Authorization: token }})
+      setTitle('')
+      setResume(null)
+      setShowUploadResume(false)
+      navigate(`/app/builder/${data.resumeId}`)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message)
+    }
+    setIsLoading(false)
+  }
 
 async function handleFileChange(e) {
   const file = e.target.files[0];
@@ -36,35 +69,41 @@ async function handleFileChange(e) {
   }
 }
 
-async function editTitle(e) {
-  e.preventDefault();
-  const updatedResumes = allResumes.map((resume) => {
-    if (resume._id === editResumeId) {
-      return { ...resume, title };
+const editTitle = async (event) => {
+    try {
+      event.preventDefault()
+      const {data} = await api.put(`/api/resumes/update`, {resumeId: editResumeId, resumeData: { title }}, {headers: { Authorization: token }})
+      setAllResumes(allResumes.map(resume => resume._id === editResumeId ? { ...resume, title } : resume))
+      setTitle('')
+      setEditResumeId('')
+      toast.success(data.message)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message)
     }
-    return resume;
-  });
-  setAllResumes(updatedResumes);
-  setEditResumeId("");
-  setTitle("");
-console.log("Updated title for resume id", editResumeId, "is", title);
-}
+     
+  }
 
 
-async function deleteResume(resumeToDeleteId) {
-  const updatedResumes = allResumes.filter((resume) => resume._id !== resumeToDeleteId);
-  setAllResumes(updatedResumes);
-  setEditResumeId("");
-  setTitle("");
-
-}
-
+const deleteResume = async (resumeId) => {
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this resume?')
+     if(confirm){
+      const {data} = await api.delete(`/api/resumes/delete/${resumeId}`, {headers: { Authorization: token }})
+      setAllResumes(allResumes.filter(resume => resume._id !== resumeId))
+      toast.success(data.message)
+     }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message)
+    }
+     
+  }
 
 
 
 
 useEffect(() => {
-  setAllResumes(dummyResumeData);
+  // setAllResumes(dummyResumeData);
+loadAllResumes();
 }, []);
 
 
