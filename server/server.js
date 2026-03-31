@@ -15,10 +15,17 @@ const PORT = process.env.PORT || 3000;
 await connectDB();
 
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://resume-forge-ai-lyart.vercel.app"
+];
+
 app.use(cors({
-  origin: "https://resume-forge-ai-git-main-aryan-ghugares-projects.vercel.app",
+  origin: allowedOrigins,
   credentials: true
 }));
+
+
 app.use(express.json());
 
 
