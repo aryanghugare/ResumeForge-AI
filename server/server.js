@@ -16,7 +16,7 @@ await connectDB();
 
 
 app.use(cors({
-  origin: "https://your-frontend.vercel.app",
+  origin: "https://resume-forge-ai-git-main-aryan-ghugares-projects.vercel.app",
   credentials: true
 }));
 app.use(express.json());
