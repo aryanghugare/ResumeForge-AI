@@ -17,7 +17,7 @@ await connectDB();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://resume-forge-ai-lyart.vercel.app"
+  "https://resume-forge-ai-seven.vercel.app" 
 ];
 
 app.use(cors({
