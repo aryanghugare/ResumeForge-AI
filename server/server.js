@@ -15,7 +15,10 @@ const PORT = process.env.PORT || 3000;
 await connectDB();
 
 
-app.use(cors());
+app.use(cors({
+  origin: "https://your-frontend.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 
 
